@@ -1,11 +1,12 @@
 using FinCtrlLibrary.Models;
+using FinCtrlLibrary.Validators;
 
 namespace FinCtrl.Test
 {
-    public class CategoryTest
+    public class CategoryConstructor
     {
         [Fact]
-        public void TestingValidCategory()
+        public void ReturnsValidCategoryWhenDataIsValid()
         {
             int categoryId = 1;
             string categoryName = "Mercado";
@@ -17,7 +18,7 @@ namespace FinCtrl.Test
         }
 
         [Fact]
-        public void TestingNegativeIdCategory()
+        public void ReturnsNegativeCategoryIdErrorWhenCategoryIdIsNull()
         {
             int categoryId = -10;
             string categoryName = "Mercado";
@@ -26,10 +27,11 @@ namespace FinCtrl.Test
             Category categoryTest = new(categoryId, categoryName);
 
             Assert.Equal(validation, categoryTest.IsValid);
+            Assert.True(categoryTest.ContainsError(GenericErrors.NegativeIdError, nameof(categoryTest.Id)));
         }
 
         [Fact]
-        public void TestingEmptyDescriptionCategory()
+        public void ReturnsEmptyCategoryNameErrorWhenCategoryNameIsEmpty()
         {
             int categoryId = 0;
             string categoryName = string.Empty;
@@ -38,10 +40,11 @@ namespace FinCtrl.Test
             Category categoryTest = new(categoryId, categoryName);
 
             Assert.Equal(validation, categoryTest.IsValid);
+            Assert.True(categoryTest.ContainsError(GenericErrors.EmptyStringError, nameof(categoryTest.Name)));
         }
 
         [Fact]
-        public void TestingTooLargeDescriptionCategory()
+        public void ReturnsCategoryNameMaxLengthExceededErrorWhenCategoryNameExceedsMaxLength()
         {
             int categoryId = 1;
             string categoryName = "Esse é um nome de categoria que supera o tamanho limite estipulado para uma categoria.";
@@ -50,6 +53,7 @@ namespace FinCtrl.Test
             Category categoryTest = new(categoryId, categoryName);
 
             Assert.Equal(validation, categoryTest.IsValid);
+            Assert.True(categoryTest.ContainsError(GenericErrors.StringSizeExcedeedError, nameof(categoryTest.Name)));
         }
     }
 }

@@ -38,12 +38,12 @@ namespace FinCtrlLibrary.Models
                 {
                     if (tagId == 0)
                     {
-                        Errors.RegisterError($"'{nameof(TagIds)}' possui um elemento como 0.");
+                        Errors.RegisterError(GenericErrors.ValueZeroError, $"'{nameof(TagIds)}' possui um elemento como 0.", nameof(TagIds));
                         break;
                     }
                     else if (int.IsNegative(tagId))
                     {
-                        Errors.RegisterError($"'{nameof(TagIds)}' possui um elemento negativo.'");
+                        Errors.RegisterError(GenericErrors.NegativeValueError, $"'{nameof(TagIds)}' possui um elemento negativo.'", nameof(TagIds));
                         break;
                     }
                 }
@@ -57,12 +57,12 @@ namespace FinCtrlLibrary.Models
                 {
                     if (discountRecordId == 0)
                     {
-                        Errors.RegisterError($"'{nameof(DiscountRecordsIds)}' possui um elemento como 0.");
+                        Errors.RegisterError(GenericErrors.ValueZeroError, $"'{nameof(DiscountRecordsIds)}' possui um elemento como 0.", nameof(DiscountRecordsIds));
                         break;
                     }
                     else if (int.IsNegative(discountRecordId))
                     {
-                        Errors.RegisterError($"'{nameof(DiscountRecordsIds)}' possui um elemento negativo.'");
+                        Errors.RegisterError(GenericErrors.NegativeValueError, $"'{nameof(DiscountRecordsIds)}' possui um elemento negativo.'", nameof(DiscountRecordsIds));
                         break;
                     }
                 }

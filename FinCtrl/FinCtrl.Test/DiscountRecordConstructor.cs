@@ -1,4 +1,5 @@
 ﻿using FinCtrlLibrary.Models;
+using FinCtrlLibrary.Validators;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace FinCtrl.Test
 {
-    public class DiscountRecordTest
+    public class DiscountRecordConstructor
     {
         [Fact]
-        public void TestingValidDiscountRecord()
+        public void ReturnsValidDiscountRecordWhenDataIsValid()
         {
             long discountRecordId = 1;
             int spendingRecordId = 2;
@@ -24,7 +25,7 @@ namespace FinCtrl.Test
         }
 
         [Fact]
-        public void TestingValidDiscountRecordWithNullDiscountRecordCategoryId()
+        public void ReturnsValidDiscountRecordWhenDicountountRecordCategoryIdIsNull()
         {
             long discountRecordId = 1;
             int spendingRecordId = 2;
@@ -35,6 +36,21 @@ namespace FinCtrl.Test
             DiscountRecord discountRecord = new(discountRecordId, spendingRecordId, discountRecordCategoryId, discountValue);
 
             Assert.Equal(validation, discountRecord.IsValid);
+        }
+
+        [Fact]
+        public void ReturnsNegativeValueErrorWhenDiscountRecordDiscountIsNegative()
+        {
+            long discountRecordId = 1;
+            int spendingRecordId = 2;
+            int? discountRecordCategoryId = 3;
+            double discountValue = -49.99;
+            bool validation = false;
+
+            DiscountRecord discountRecord = new(discountRecordId, spendingRecordId, discountRecordCategoryId, discountValue);
+
+            Assert.Equal(validation, discountRecord.IsValid);
+            Assert.True(discountRecord.ContainsError(GenericErrors.NegativeValueError, nameof(discountRecord.DiscountValue)));
         }
     }
 }

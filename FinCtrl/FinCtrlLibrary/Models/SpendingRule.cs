@@ -1,4 +1,6 @@
-﻿using FinCtrlLibrary.Validators;
+﻿using FinCtrlLibrary.Exceptions;
+using FinCtrlLibrary.Validators;
+using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using System.Xml.XPath;
 
@@ -8,12 +10,28 @@ namespace FinCtrlLibrary.Models
     {
         private const int _nameMaxLength = 30;
         private const int _ruleMaxLength = 100;
-        private const string _stringValueForReplacing = "VALUE";
+        private const string _stringValueForReplacing = "{0}";
 
         public int Id { get; set; }
-        public required string Name { get; set; }
-        public required string Rule { get; set; }
+        public string Name { get; set; }
+        public string Rule { get; set; }
+        public static string StringValueForReplacing => _stringValueForReplacing;
 
+        public SpendingRule(int id, string name, string rule)
+        {
+            Id = id;
+            Name = name;
+            Rule = rule;
+            Validate();
+        }
+
+        public enum SpendingRuleErrors
+        {
+            NoReplaceableStringForExpressionError,
+            InvalidExpressionError,
+            ExpressionCalculationError,
+            InifinityResultError
+        }
 
         public double CalculateValueByRule(double value)
         {
@@ -32,6 +50,9 @@ namespace FinCtrlLibrary.Models
 
             double resultDoubleValue = (double)xPathDocument.CreateNavigator().Evaluate(string.Format("number({0})", expressionToBeCalculated));
 
+            if (double.IsInfinity(resultDoubleValue) || double.IsNegativeInfinity(resultDoubleValue))
+                throw new InfinityValueException("Resultado da conta gerou valor infinito");
+            
             return resultDoubleValue;
         }
 
@@ -52,12 +73,12 @@ namespace FinCtrlLibrary.Models
 
         protected override void Validate()
         {
-            IdValidation(Id);
+            IdValidation(Id, nameof(Id));
             NotEmptyStringLengthValidation(nameof(Name), Name, _nameMaxLength);
             NotEmptyStringLengthValidation(nameof(Rule), Rule, _ruleMaxLength);
 
             if (!Rule.Contains(_stringValueForReplacing))
-                Errors.RegisterError("A regra deve conter o texto de substituição para cálculo.");
+                Errors.RegisterError(SpendingRuleErrors.NoReplaceableStringForExpressionError, "A regra deve conter o texto de substituição para cálculo.");
 
             if (!Errors.Any())
             {
@@ -67,13 +88,17 @@ namespace FinCtrlLibrary.Models
                 {
                     CalculateValueByExpression(expressionToBeCalculatedWithInput0);
                 }
+                catch (InfinityValueException)
+                {
+                    Errors.RegisterError(SpendingRuleErrors.InifinityResultError, "Resultado do teste resultou em valor infinito.");
+                }
                 catch (XPathException ex)
                 {
-                    Errors.RegisterError($"Expressão ({expressionToBeCalculatedWithInput0}) gerada pela regra possui sintaxe ou caracteres inválidos! {ex.Message}");
+                    Errors.RegisterError(SpendingRuleErrors.InvalidExpressionError, $"Expressão ({expressionToBeCalculatedWithInput0}) gerada pela regra possui sintaxe ou caracteres inválidos! {ex.Message}");
                 }
                 catch (Exception ex)
                 {
-                    Errors.RegisterError($"Houve algum erro para calcular a expressão: {expressionToBeCalculatedWithInput0}. {ex.Message}");
+                    Errors.RegisterError(SpendingRuleErrors.ExpressionCalculationError, $"Houve algum erro para calcular a expressão: {expressionToBeCalculatedWithInput0}. {ex.Message}");
                 }
 
                 string expressionToBeCalculatedWithInput100 = GetExpressionToBeCalculated(100);
@@ -82,13 +107,17 @@ namespace FinCtrlLibrary.Models
                 {
                     CalculateValueByExpression(expressionToBeCalculatedWithInput100);
                 }
+                catch (InfinityValueException)
+                {
+                    Errors.RegisterError(SpendingRuleErrors.InifinityResultError, "Resultado do teste resultou em valor infinito.");
+                }
                 catch (XPathException ex)
                 {
-                    Errors.RegisterError($"Expressão ({expressionToBeCalculatedWithInput100}) gerada pela regra possui sintaxe ou caracteres inválidos! {ex.Message}");
+                    Errors.RegisterError(SpendingRuleErrors.InvalidExpressionError, $"Expressão ({expressionToBeCalculatedWithInput100}) gerada pela regra possui sintaxe ou caracteres inválidos! {ex.Message}");
                 }
                 catch (Exception ex)
                 {
-                    Errors.RegisterError($"Houve algum erro para calcular a expressão: {expressionToBeCalculatedWithInput100}. {ex.Message}");
+                    Errors.RegisterError(SpendingRuleErrors.ExpressionCalculationError, $"Houve algum erro para calcular a expressão: {expressionToBeCalculatedWithInput100}. {ex.Message}");
                 }
             }
         }

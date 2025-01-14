@@ -25,7 +25,7 @@ namespace FinCtrlLibrary.Models
 
         protected override void Validate()
         {
-            IdValidation(Id);
+            IdValidation(Id, nameof(Id));
             NotEmptyStringValidation(nameof(Name), Name);
             NotEmptyStringLengthValidation(nameof(Name), Name, _nameMaxLength);
         }
