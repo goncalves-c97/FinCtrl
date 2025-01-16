@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FinCtrl.Test
+namespace FinCtrl.Test.Models.Constructors
 {
     public class DiscountRecordConstructor
     {

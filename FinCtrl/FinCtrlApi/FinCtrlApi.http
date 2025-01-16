@@ -1,0 +1,6 @@
+@FinCtrlApi_HostAddress = http://localhost:5246
+
+GET {{FinCtrlApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

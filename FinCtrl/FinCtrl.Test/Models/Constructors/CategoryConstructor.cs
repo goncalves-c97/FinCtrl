@@ -1,7 +1,7 @@
 using FinCtrlLibrary.Models;
 using FinCtrlLibrary.Validators;
 
-namespace FinCtrl.Test
+namespace FinCtrl.Test.Models.Constructors
 {
     public class CategoryConstructor
     {

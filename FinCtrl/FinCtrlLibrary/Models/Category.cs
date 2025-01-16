@@ -1,4 +1,6 @@
 ﻿using FinCtrlLibrary.Validators;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace FinCtrlLibrary.Models
 {
@@ -6,7 +8,11 @@ namespace FinCtrlLibrary.Models
     {
         private const int _nameMaxLength = 30;
 
+        [BsonId]
+        public ObjectId _id { get; set; }
+        [BsonElement("id")]
         public int Id { get; set; }
+        [BsonElement("name")]
         public string Name { get; set; }
 
         public Category(string name)

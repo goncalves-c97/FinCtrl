@@ -12,7 +12,7 @@ namespace FinCtrlLibrary.Models
         public int Installments { get; set; }
         public int? CategoryId { get; set; }
         public List<int>? TagIds { get; set; }
-        public required string Description { get; set; }
+        public string Description { get; set; }
         public List<int>? DiscountRecordsIds { get; set; }
         public double OriginalValue { get; set; }
         public int? RuleId { get; set; }
@@ -23,14 +23,31 @@ namespace FinCtrlLibrary.Models
         public List<Category>? Tags { get; set; }
         public List<DiscountRecord>? DiscountRecords { get; set; }
 
+        public SpendingRecord(int id, DateTime dateTime, int spendingPaymentCategoryId, int installments, int? categoryId, 
+            List<int>? tagIds, string description, List<int>? discountRecordsIds, double originalValue, int? ruleId, bool paid)
+        {
+            Id = id;
+            DateTime = dateTime;
+            SpendingPaymentCategoryId = spendingPaymentCategoryId;
+            Installments = installments;
+            CategoryId = categoryId;
+            TagIds = tagIds;
+            Description = description;
+            DiscountRecordsIds = discountRecordsIds;
+            OriginalValue = originalValue;
+            RuleId = ruleId;
+            Paid = paid;
+            Validate();
+        }
+
         protected override void Validate()
         {
-            IdValidation(Id);
-            PositiveValueValidation(nameof(SpendingPaymentCategoryId), SpendingPaymentCategoryId);
+            IdValidation(Id, nameof(Id));
+            IdValidation(SpendingPaymentCategoryId, nameof(SpendingPaymentCategoryId), true);
             PositiveValueValidation(nameof(Installments), Installments);
 
             if(CategoryId != null)
-                PositiveValueValidation(nameof(CategoryId), (int)CategoryId);
+                IdValidation((int)CategoryId, nameof(CategoryId), true);
 
             if(TagIds != null)
             { 
@@ -38,12 +55,12 @@ namespace FinCtrlLibrary.Models
                 {
                     if (tagId == 0)
                     {
-                        Errors.RegisterError(GenericErrors.ValueZeroError, $"'{nameof(TagIds)}' possui um elemento como 0.", nameof(TagIds));
+                        Errors.RegisterError(GenericErrors.IdZeroError, $"'{nameof(TagIds)}' possui um ou mais elementos como 0.", nameof(TagIds));
                         break;
                     }
                     else if (int.IsNegative(tagId))
                     {
-                        Errors.RegisterError(GenericErrors.NegativeValueError, $"'{nameof(TagIds)}' possui um elemento negativo.'", nameof(TagIds));
+                        Errors.RegisterError(GenericErrors.NegativeIdError, $"'{nameof(TagIds)}' possui um ou mais elementos negativos.'", nameof(TagIds));
                         break;
                     }
                 }
@@ -57,12 +74,12 @@ namespace FinCtrlLibrary.Models
                 {
                     if (discountRecordId == 0)
                     {
-                        Errors.RegisterError(GenericErrors.ValueZeroError, $"'{nameof(DiscountRecordsIds)}' possui um elemento como 0.", nameof(DiscountRecordsIds));
+                        Errors.RegisterError(GenericErrors.IdZeroError, $"'{nameof(DiscountRecordsIds)}' possui um ou mais elementos como 0.", nameof(DiscountRecordsIds));
                         break;
                     }
                     else if (int.IsNegative(discountRecordId))
                     {
-                        Errors.RegisterError(GenericErrors.NegativeValueError, $"'{nameof(DiscountRecordsIds)}' possui um elemento negativo.'", nameof(DiscountRecordsIds));
+                        Errors.RegisterError(GenericErrors.NegativeIdError, $"'{nameof(DiscountRecordsIds)}' possui um ou mais elementos negativos.'", nameof(DiscountRecordsIds));
                         break;
                     }
                 }
@@ -71,7 +88,7 @@ namespace FinCtrlLibrary.Models
             PositiveValueValidation(nameof(OriginalValue), OriginalValue);
 
             if (RuleId != null)
-                PositiveValueValidation(nameof(RuleId), (int)RuleId);
+                IdValidation((int)RuleId, nameof(RuleId), true);
         }
     }
 }

@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35222.181
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FinCtrlMauiApp", "FinCtrlMauiApp\FinCtrlMauiApp.csproj", "{06176980-FEC9-414B-AF04-A4973B36900F}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FinCtrlWebApp", "FinCtrlWebApp\FinCtrlWebApp.csproj", "{4EA147C0-8014-4C91-98CD-4DC6254AB2DC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FinCtrlLibrary", "FinCtrlLibrary\FinCtrlLibrary.csproj", "{5F878C06-E893-4940-8EDA-9B9111825E4E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinCtrl.Test", "FinCtrl.Test\FinCtrl.Test.csproj", "{FAFDF779-EA28-4319-A517-6B49A3303027}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{0AA99CC0-2C1F-4CB0-9779-37BD1AFED848}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinCtrlMauiApp", "FinCtrlMauiApp\FinCtrlMauiApp.csproj", "{92F2AA60-AF4B-4651-8566-38C72FEE6B77}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinCtrlApi", "FinCtrlApi\FinCtrlApi.csproj", "{CBA941AE-9B6C-4F05-BD65-744CA039CAC4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,12 +19,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{06176980-FEC9-414B-AF04-A4973B36900F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{06176980-FEC9-414B-AF04-A4973B36900F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{06176980-FEC9-414B-AF04-A4973B36900F}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{06176980-FEC9-414B-AF04-A4973B36900F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{06176980-FEC9-414B-AF04-A4973B36900F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{06176980-FEC9-414B-AF04-A4973B36900F}.Release|Any CPU.Deploy.0 = Release|Any CPU
 		{4EA147C0-8014-4C91-98CD-4DC6254AB2DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4EA147C0-8014-4C91-98CD-4DC6254AB2DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4EA147C0-8014-4C91-98CD-4DC6254AB2DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -37,12 +31,19 @@ Global
 		{FAFDF779-EA28-4319-A517-6B49A3303027}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FAFDF779-EA28-4319-A517-6B49A3303027}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FAFDF779-EA28-4319-A517-6B49A3303027}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92F2AA60-AF4B-4651-8566-38C72FEE6B77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92F2AA60-AF4B-4651-8566-38C72FEE6B77}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92F2AA60-AF4B-4651-8566-38C72FEE6B77}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{92F2AA60-AF4B-4651-8566-38C72FEE6B77}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92F2AA60-AF4B-4651-8566-38C72FEE6B77}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92F2AA60-AF4B-4651-8566-38C72FEE6B77}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{CBA941AE-9B6C-4F05-BD65-744CA039CAC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CBA941AE-9B6C-4F05-BD65-744CA039CAC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CBA941AE-9B6C-4F05-BD65-744CA039CAC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CBA941AE-9B6C-4F05-BD65-744CA039CAC4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{FAFDF779-EA28-4319-A517-6B49A3303027} = {0AA99CC0-2C1F-4CB0-9779-37BD1AFED848}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DEF36400-BD75-4611-8311-5EDFC50B91F3}

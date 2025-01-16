@@ -1,6 +1,9 @@
 ﻿using System.Collections;
 using System.Text;
 using System.Linq;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.Serialization;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace FinCtrlLibrary.Validators
 {
@@ -21,6 +24,7 @@ namespace FinCtrlLibrary.Validators
             return errors.GetEnumerator();
         }
 
+        [BsonIgnore]
         public string Summary
         {
             get
@@ -35,8 +39,11 @@ namespace FinCtrlLibrary.Validators
 
     public class Error()
     {
+        [BsonIgnore]
         public Enum ErrorEnum { get; set; }
+        [BsonIgnore]
         public string? PropertyName { get; set; }
+        [BsonIgnore]
         public string Message { get; set; }
 
         public Error(Enum errorEnum, string message) : this()
@@ -69,29 +76,37 @@ namespace FinCtrlLibrary.Validators
     {
         private readonly Errors errors = [];
 
+        [BsonIgnore]
         public bool IsValid => !errors.Any();
+        [BsonIgnore]
         public Errors Errors => errors;
-        protected abstract void Validate();
 
+        protected abstract void Validate();
+        
         public bool ContainsError(Enum errorEnum) => errors.Any(x => x.ErrorEnum.ToString() == errorEnum.ToString());
         public bool ContainsError(Enum errorEnum, string propertyName) => errors.Any(x => x.ErrorEnum.ToString() == errorEnum.ToString() && x.PropertyName == propertyName);
         public bool ContainsError(int enumValue, string propertyName) => errors.Any(x => Convert.ToInt32(x.ErrorEnum) == enumValue && x.PropertyName == propertyName);
+
         protected void IdValidation(int id, string? propertyName = null, bool validateZero = false)
         {
+            string propertyNameToConsider = propertyName != null ? propertyName : "Id";
+
             if (!int.IsPositive(id))
-                Errors.RegisterError(GenericErrors.NegativeIdError, "Id não pode ser negativo.", propertyName);
+                Errors.RegisterError(GenericErrors.NegativeIdError, $"{propertyNameToConsider} não pode ser negativo.", propertyName);
 
             if (validateZero && id == 0)
-                Errors.RegisterError(GenericErrors.IdZeroError, "Id não pode ser 0", propertyName);
+                Errors.RegisterError(GenericErrors.IdZeroError, $"{propertyNameToConsider} não pode ser 0", propertyName);
         }
 
         protected void IdValidation(long id, string? propertyName = null, bool validateZero = false)
         {
+            string propertyNameToConsider = propertyName != null ? propertyName : "Id";
+
             if (!long.IsPositive(id))
-                Errors.RegisterError(GenericErrors.NegativeIdError, "Id não pode ser negativo.", propertyName);
+                Errors.RegisterError(GenericErrors.NegativeIdError, $"{propertyNameToConsider} não pode ser negativo.", propertyName);
 
             if (validateZero && id == 0)
-                Errors.RegisterError(GenericErrors.IdZeroError, "Id não pode ser 0", propertyName);
+                Errors.RegisterError(GenericErrors.IdZeroError, $"{propertyNameToConsider} não pode ser 0", propertyName);
         }
 
         protected void PositiveValueValidation(string propertyName, int value, bool validateZero = false)

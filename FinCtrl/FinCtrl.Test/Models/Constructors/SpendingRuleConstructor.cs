@@ -2,7 +2,7 @@
 using FinCtrlLibrary.Validators;
 using static FinCtrlLibrary.Models.SpendingRule;
 
-namespace FinCtrl.Test
+namespace FinCtrl.Test.Models.Constructors
 {
     public class SpendingRuleConstructor
     {
@@ -58,7 +58,7 @@ namespace FinCtrl.Test
             SpendingRule spendingRule = new(id, spendingRuleName, rule);
 
             Assert.Equal(validation, spendingRule.IsValid);
-            Assert.True(spendingRule.ContainsError(SpendingRuleErrors.NoReplaceableStringForExpressionError));
+            Assert.True(spendingRule.ContainsError(SpendingRuleCustomErrors.NoReplaceableStringForExpressionError));
         }
 
         [Fact]
@@ -66,13 +66,13 @@ namespace FinCtrl.Test
         {
             int id = 1;
             string spendingRuleName = "Divisão familiar";
-            string rule = $"10 / {StringValueForReplacing}"; // (({0} / 5) * 3) / 2
+            string rule = $"(10 * {StringValueForReplacing}) / 0"; // (10 * {0}) / 0
             bool validation = false;
 
             SpendingRule spendingRule = new(id, spendingRuleName, rule);
 
             Assert.Equal(validation, spendingRule.IsValid);
-            Assert.True(spendingRule.ContainsError(SpendingRuleErrors.InifinityResultError));
+            Assert.True(spendingRule.ContainsError(SpendingRuleCustomErrors.InifinityResultError));
         }
     }
 }
