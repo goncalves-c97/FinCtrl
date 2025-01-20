@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinCtrlMauiApp", "FinCtrlMa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinCtrlApi", "FinCtrlApi\FinCtrlApi.csproj", "{CBA941AE-9B6C-4F05-BD65-744CA039CAC4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinCtrl.Test.Integracao", "FinCtrl.Test.Integracao\FinCtrl.Test.Integracao.csproj", "{E2B9D484-8C82-450D-B414-1449EBC305CF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,10 @@ Global
 		{CBA941AE-9B6C-4F05-BD65-744CA039CAC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CBA941AE-9B6C-4F05-BD65-744CA039CAC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CBA941AE-9B6C-4F05-BD65-744CA039CAC4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E2B9D484-8C82-450D-B414-1449EBC305CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2B9D484-8C82-450D-B414-1449EBC305CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2B9D484-8C82-450D-B414-1449EBC305CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2B9D484-8C82-450D-B414-1449EBC305CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

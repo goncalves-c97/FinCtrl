@@ -58,8 +58,8 @@ namespace FinCtrlLibrary.Models
 
         private string GetExpressionToBeCalculated(double value)
         {
-            string baseExpression = Rule.Replace(_stringValueForReplacing, value.ToString());
-
+            string baseExpression = Rule.Replace(_stringValueForReplacing, value.ToString()).Replace(',', '.');
+            
             Regex mathSymbolsRegex = new(@"([\+\-\*])");
 
             string expressionToBeCalculated = mathSymbolsRegex

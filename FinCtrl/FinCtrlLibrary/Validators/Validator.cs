@@ -4,6 +4,7 @@ using System.Linq;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
+using System.Text.Json.Serialization;
 
 namespace FinCtrlLibrary.Validators
 {
@@ -70,15 +71,17 @@ namespace FinCtrlLibrary.Validators
         StringSizeExcedeedError,
         StringMinSizeNotReachedError,
         StringOutOfSizeRangeError,
+        NullValueError,
+        InvalidObjectError
     }
 
     public abstract class Validator
     {
         private readonly Errors errors = [];
 
-        [BsonIgnore]
+        [BsonIgnore, JsonIgnore]
         public bool IsValid => !errors.Any();
-        [BsonIgnore]
+        [BsonIgnore, JsonIgnore]
         public Errors Errors => errors;
 
         protected abstract void Validate();
@@ -160,6 +163,25 @@ namespace FinCtrlLibrary.Validators
 
             if (propertyValue.Length < minLength || propertyValue.Length > maxLength)
                 Errors.RegisterError(GenericErrors.StringOutOfSizeRangeError, $"'{propertyName}' deve possuir entre {minLength} e {maxLength} caracteres.", propertyName);
+        }
+
+        protected void NotNullValueValidation(object obj, string propertyName)
+        {
+            if (obj == null)
+                Errors.RegisterError(GenericErrors.NullValueError, $"'{propertyName}' não pode ser nulo!", nameof(propertyName));
+        }
+
+        protected void ValidObjectValidation(Validator objWithValidator, string propertyName)
+        {
+            if (!objWithValidator.IsValid)
+            {
+                Errors.RegisterError(GenericErrors.InvalidObjectError, $"'{propertyName}' possui {objWithValidator.Errors.Count()} erro(s)");
+
+                foreach(var erro in objWithValidator.Errors)
+                {
+                    Errors.RegisterError(erro.ErrorEnum, $"'{propertyName}' -> " + erro.Message, erro.PropertyName);
+                }
+            }
         }
     }
 }

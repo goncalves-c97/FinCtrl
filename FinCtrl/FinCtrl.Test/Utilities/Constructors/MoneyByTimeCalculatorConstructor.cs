@@ -1,10 +1,15 @@
 ﻿using FinCtrlLibrary.Utilities;
 using FinCtrlLibrary.Validators;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using static FinCtrlLibrary.Utilities.WorkHoursAndSalary;
 
 namespace FinCtrl.Test.Utilities.Constructors
 {
-    public class WorkHoursAndSalaryConstructor
+    public class MoneyByTimeCalculatorConstructor
     {
         [Theory]
         [InlineData(30, 24, 5000, true)]
@@ -13,8 +18,8 @@ namespace FinCtrl.Test.Utilities.Constructors
         public void ReturnsValidWhenDataIsValid(int workDaysPerMonth, int workHoursPerDay, double netSalary, bool validation)
         {
             WorkHoursAndSalary workHoursAndSalary = new(workDaysPerMonth, workHoursPerDay, netSalary);
-
-            Assert.Equal(workHoursAndSalary.IsValid, validation);
+            MoneyByTimeCalculator moneyByTimeCalculator = new(workHoursAndSalary);
+            Assert.Equal(moneyByTimeCalculator.IsValid, validation);
         }
 
         [Theory]
@@ -25,8 +30,8 @@ namespace FinCtrl.Test.Utilities.Constructors
         public void ReturnsInvalidWhenDataIsInvalid(int workDaysPerMonth, int workHoursPerDay, double netSalary, bool validation)
         {
             WorkHoursAndSalary workHoursAndSalary = new(workDaysPerMonth, workHoursPerDay, netSalary);
-
-            Assert.Equal(workHoursAndSalary.IsValid, validation);
+            MoneyByTimeCalculator moneyByTimeCalculator = new(workHoursAndSalary);
+            Assert.Equal(moneyByTimeCalculator.IsValid, validation);
         }
 
         [Theory]
@@ -41,8 +46,9 @@ namespace FinCtrl.Test.Utilities.Constructors
         public void ReturnsErrorWhenPossibleValuesAreInvalid(int workDaysPerMonth, int workHoursPerDay, double netSalary, Enum error, string propertyName, bool validation)
         {
             WorkHoursAndSalary workHoursAndSalary = new(workDaysPerMonth, workHoursPerDay, netSalary);
-            Assert.Equal(workHoursAndSalary.IsValid, validation);
-            Assert.True(workHoursAndSalary.ContainsError(error, propertyName));
+            MoneyByTimeCalculator moneyByTimeCalculator = new(workHoursAndSalary);
+            Assert.Equal(moneyByTimeCalculator.IsValid, validation);
+            Assert.True(moneyByTimeCalculator.ContainsError(error, propertyName));
         }
     }
 }

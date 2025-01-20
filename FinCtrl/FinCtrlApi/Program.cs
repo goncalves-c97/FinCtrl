@@ -1,10 +1,16 @@
-
-
 using FinCtrlApi.Databases.MongoDb.FinCtrl;
 using FinCtrlApi.Databases.MongoDb.FinCtrl.Interfaces;
 using FinCtrlApi.Databases.MongoDb.FinCtrl.Repositories;
+using FinCtrlApi.Entities;
+using FinCtrlLibrary.Middlewares;
 using Microsoft.EntityFrameworkCore;
-using MongoDB.Driver;
+using Serilog;
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File(EntitiesHelperClass.DebugBuild ? "log.txt" : "C:\\log.txt",
+        rollingInterval: RollingInterval.Day)
+    .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,9 +21,6 @@ if (mongoDbConnectionString == null)
     Console.WriteLine("String de conexão ao banco não setada.");
     Environment.Exit(0);
 }
-
-//MongoClient client = new(mongoDbConnectionString);
-//FinCtrlAppDbContext db = FinCtrlAppDbContext.Create(client.GetDatabase("FinCtrl"));
 
 // Add services to the container.
 builder.Services.AddDbContextPool<FinCtrlAppDbContext>(
@@ -31,6 +34,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<ICategory, CategoryRepository>();
 
 var app = builder.Build();
+
+app.UseMiddleware<RequestResponseLoggingMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

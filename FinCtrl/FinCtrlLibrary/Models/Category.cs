@@ -1,6 +1,7 @@
 ﻿using FinCtrlLibrary.Validators;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using System.Text.Json.Serialization;
 
 namespace FinCtrlLibrary.Models
 {
@@ -8,7 +9,7 @@ namespace FinCtrlLibrary.Models
     {
         private const int _nameMaxLength = 30;
 
-        [BsonId]
+        [BsonId, JsonIgnore]
         public ObjectId _id { get; set; }
         [BsonElement("id")]
         public int Id { get; set; }
