@@ -4,6 +4,7 @@ using FinCtrlApi.Databases.MongoDb.FinCtrl.Repositories;
 using FinCtrlApi.Entities;
 using FinCtrlLibrary.Middlewares;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Bson.Serialization.Conventions;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -13,6 +14,8 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
+
+ConfigureMongoDB();
 
 string? mongoDbConnectionString = builder.Configuration.GetConnectionString("MongoDbString");
 
@@ -32,6 +35,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddTransient<ICategory, CategoryRepository>();
+builder.Services.AddTransient<ISpendingRecord, SpendingRecordRepository>();
 
 var app = builder.Build();
 
@@ -51,3 +55,19 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+// MongoDB configuration method
+static void ConfigureMongoDB()
+{
+    var conventionPack = new ConventionPack
+    {
+        new IgnoreIfDefaultConvention(true),
+        new IgnoreIfNullConvention(true),
+        new IgnoreExtraElementsConvention(true)
+    };
+    ConventionRegistry.Register(
+        "IgnoreDefaultValues",
+        conventionPack,
+        type => true // Apply to all types
+    );
+}

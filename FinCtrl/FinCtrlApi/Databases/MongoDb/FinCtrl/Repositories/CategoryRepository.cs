@@ -1,4 +1,5 @@
 ﻿using FinCtrlApi.Databases.MongoDb.FinCtrl.Interfaces;
+using FinCtrlApi.Utilities;
 using FinCtrlLibrary.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,43 +7,49 @@ namespace FinCtrlApi.Databases.MongoDb.FinCtrl.Repositories
 {
     public class CategoryRepository : ICategory
     {
-        private FinCtrlAppDbContext _context;
+        private readonly FinCtrlAppDbContext _context;
 
         public CategoryRepository(FinCtrlAppDbContext appDbContext) => _context = appDbContext;
 
-        public void DeleteById(int id)
+        public async Task DeleteByIdAsync(int id)
         {
-            Category? category = GetById(id);
-
-            try
+            await ProjPolicies.ExecuteWithRetryAsync(async () =>
             {
+                Category? category = await GetByIdAsync(id);
+
+                if (category == null) 
+                    return;
+
                 _context.Categories.Remove(category);
-                _context.SaveChanges();
-            }
-            catch (Exception ex)
+                await _context.SaveChangesAsync();
+            });
+        }
+
+        public async Task<Category?> GetByIdAsync(int id)
+        {
+            return await ProjPolicies.ExecuteWithRetryAsync(() =>
+                _context.Categories
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(x => x.Id == id)
+            );
+        }
+
+        public async Task<List<Category>> GetListAsync()
+        {
+            return await ProjPolicies.ExecuteWithRetryAsync(() =>
+                _context.Categories
+                    .AsNoTracking()
+                    .ToListAsync()
+            );
+        }
+
+        public async Task InsertNewAsync(Category category)
+        {
+            await ProjPolicies.ExecuteWithRetryAsync(async () =>
             {
-                throw new Exception();
-            }
-        }
-
-        public Category? GetById(int id)
-        {
-            return _context.Categories
-                .AsNoTracking()
-                .FirstOrDefault(x => x.Id == id);
-        }
-
-        public List<Category> GetList()
-        {
-            return _context.Categories
-                .AsNoTracking()
-                .ToList();
-        }
-
-        public void InsertNew(Category category)
-        {
-            _context.Categories.Add(category);
-            _context.SaveChanges();
+                _context.Categories.Add(category);
+                await _context.SaveChangesAsync();
+            });
         }
     }
 }
