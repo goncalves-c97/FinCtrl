@@ -1,20 +1,26 @@
 ﻿using FinCtrlLibrary.Validators;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace FinCtrlLibrary.Models
 {
-    public class Category : Validator
+    public class Category : ValidatorClass
     {
         private const int _nameMaxLength = 30;
 
         [BsonId, JsonIgnore]
         public ObjectId _id { get; set; }
-        [BsonElement("id")]
+        [BsonIgnore, BsonElement("id")]
         public int Id { get; set; }
         [BsonElement("name")]
         public string Name { get; set; }
+
+        public Category()
+        {
+
+        }
 
         public Category(string name)
         {
@@ -35,6 +41,11 @@ namespace FinCtrlLibrary.Models
             IdValidation(Id, nameof(Id));
             NotEmptyStringValidation(nameof(Name), Name);
             NotEmptyStringLengthValidation(nameof(Name), Name, _nameMaxLength);
+        }
+
+        public override string ToString()
+        {
+            return $"{_id} - {Name}";
         }
     }
 }

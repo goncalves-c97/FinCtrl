@@ -1,30 +1,55 @@
 ﻿using FinCtrlLibrary.Validators;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
+using System.Text.Json.Serialization;
 
 namespace FinCtrlLibrary.Models
 {
-    public class SpendingRecord : Validator
+    public class SpendingRecord : ValidatorClass
     {
         private const int _descriptionMaxLength = 100;
 
+        [BsonId]
+        public ObjectId _id { get; set; }
+        [BsonIgnore]
         public long Id { get; set; }
         public DateTime DateTime { get; set; }
         public int SpendingPaymentCategoryId { get; set; }
         public int Installments { get; set; }
+        [BsonIgnore]
         public int? CategoryId { get; set; }
+        public string? CategoryBsonId { get; set; }
+        [BsonIgnore]
         public List<int>? TagIds { get; set; } = [];
+        public List<int>? TagBsonIds { get; set; } = [];
         public string Description { get; set; }
+        [BsonIgnore]
         public List<long>? DiscountRecordsIds { get; set; } = [];
+        public List<long>? DiscountRecordsBsonIds { get; set; } = [];
         public double UnitValue { get; set; }
         public double OriginalValue { get; set; }
+        [BsonIgnore]
         public int? SpendingRuleId { get; set; }
+        public string? SpendingRuleBsonId { get; set; }
         public bool Paid { get; set; }
 
+        [BsonIgnore]
         public Category SpendingPaymentCategory { get; set; }
+        [BsonIgnore]
         public Category? Category { get; set; }
+        [BsonIgnore]
         public List<Category>? Tags { get; set; } = [];
+        [BsonIgnore]
         public List<DiscountRecord>? DiscountRecords { get; set; } = [];
+        [BsonIgnore]
         public SpendingRule? SpendingRule { get; set; }
+
+        public SpendingRecord()
+        {
+
+        }
 
         public SpendingRecord(int id, DateTime dateTime, int spendingPaymentCategoryId, int installments, int? categoryId,
             List<int>? tagIds, string description, List<long>? discountRecordsIds, double unitValue, double originalValue, int? ruleId, bool paid)
