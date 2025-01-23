@@ -6,7 +6,7 @@ using System.Xml.XPath;
 
 namespace FinCtrlLibrary.Models
 {
-    public class SpendingRule : Validator
+    public class SpendingRule : ValidatorClass
     {
         private const int _nameMaxLength = 30;
         private const int _ruleMaxLength = 100;

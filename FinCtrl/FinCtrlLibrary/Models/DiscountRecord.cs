@@ -2,7 +2,7 @@
 
 namespace FinCtrlLibrary.Models
 {
-    public class DiscountRecord : Validator
+    public class DiscountRecord : ValidatorClass
     {
         public long Id { get; set; }
         public int SpendingRecordId { get; set; }

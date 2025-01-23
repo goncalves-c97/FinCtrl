@@ -4,7 +4,7 @@ using static FinCtrlLibrary.Utilities.ProjEnumerators;
 
 namespace FinCtrlLibrary.Utilities
 {
-    public class MoneyByTimeCalculator : Validator
+    public class MoneyByTimeCalculator : ValidatorClass
     {
         private double year;
         private double month;

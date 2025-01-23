@@ -3,7 +3,7 @@ using static FinCtrlLibrary.Utilities.ProjEnumerators;
 
 namespace FinCtrlLibrary.Utilities
 {
-    public class WorkHoursAndSalary : Validator
+    public class WorkHoursAndSalary : ValidatorClass
     {
         private const int _maximumWorkDaysPerMonth = 30;
         private const int _maximumWorkHoursPerDay = 24;

@@ -36,6 +36,11 @@ namespace FinCtrlLibrary.Validators
                 return sb.ToString();
             }
         }
+
+        public override string ToString()
+        {
+            return $"{Summary}";
+        }
     }
 
     public class Error()
@@ -75,7 +80,7 @@ namespace FinCtrlLibrary.Validators
         InvalidObjectError
     }
 
-    public abstract class Validator
+    public abstract class ValidatorClass
     {
         private readonly Errors errors = [];
 
@@ -171,7 +176,7 @@ namespace FinCtrlLibrary.Validators
                 Errors.RegisterError(GenericErrors.NullValueError, $"'{propertyName}' não pode ser nulo!", nameof(propertyName));
         }
 
-        protected void ValidObjectValidation(Validator objWithValidator, string propertyName)
+        protected void ValidObjectValidation(ValidatorClass objWithValidator, string propertyName)
         {
             if (!objWithValidator.IsValid)
             {
