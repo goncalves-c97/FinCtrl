@@ -72,7 +72,7 @@ namespace FinCtrlLibrary.Middlewares
                     context.Response.Body = responseBodyStream;
 
                     // Call the next middleware in the pipeline
-                    await _next(context);
+                    //await _next(context); // TODO: Verificar bug de chamada dupla à rota ao executar essa linha
 
                     // Reset the response body stream position and read it
                     responseBodyStream.Seek(0, SeekOrigin.Begin);
