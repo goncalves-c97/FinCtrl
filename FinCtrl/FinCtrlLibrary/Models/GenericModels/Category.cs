@@ -1,16 +1,15 @@
-﻿using FinCtrlLibrary.Validators;
+﻿using FinCtrlLibrary.Interfaces;
+using FinCtrlLibrary.Validators;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
-namespace FinCtrlLibrary.Models
+namespace FinCtrlLibrary.Models.GenericModels
 {
-    public class Category : ValidatorClass
+    public class Category : ValidatorClass, IMongoDbItem
     {
         private const int _nameMaxLength = 30;
 
-        [BsonId, JsonIgnore]
+        [BsonId]
         public ObjectId _id { get; set; }
         [BsonIgnore, BsonElement("id")]
         public int Id { get; set; }
