@@ -3,6 +3,7 @@ using FinCtrlApi.Databases.MongoDb.FinCtrl.Interfaces;
 using FinCtrlApi.Databases.MongoDb.FinCtrl.Repositories;
 using FinCtrlApi.Entities;
 using FinCtrlLibrary.Middlewares;
+using FinCtrlLibrary.Models;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Bson.Serialization.Conventions;
 using Serilog;
@@ -34,8 +35,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddTransient<ICategory, CategoryRepository>();
-builder.Services.AddTransient<ISpendingRecord, SpendingRecordRepository>();
+builder.Services.AddScoped<IGenericRepository<SpendingCategory>, GenericRepository<SpendingCategory>>();
+builder.Services.AddScoped<IGenericRepository<PaymentCategory>, GenericRepository<PaymentCategory>>();
+builder.Services.AddScoped<IGenericRepository<TagCategory>, GenericRepository<TagCategory>>();
+builder.Services.AddScoped<IGenericRepository<SpendingRule>, GenericRepository<SpendingRule>>();
 
 var app = builder.Build();
 
@@ -61,7 +64,6 @@ static void ConfigureMongoDB()
 {
     var conventionPack = new ConventionPack
     {
-        new IgnoreIfDefaultConvention(true),
         new IgnoreIfNullConvention(true),
         new IgnoreExtraElementsConvention(true)
     };
