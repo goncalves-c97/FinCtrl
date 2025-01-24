@@ -10,7 +10,7 @@ namespace FinCtrlApi.Utilities
 {
     public static class ProjPolicies
     {
-        private const int _databaseRetryCount = 1;  // 3 tentativas
+        private const int _databaseRetryCount = 3;  // 3 tentativas
         private const int _httpRetryCount = 3;  // 3 tentativas
         private const int _httpRequestTimeout = 30; // 30 segundos
 
