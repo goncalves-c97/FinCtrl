@@ -1,4 +1,4 @@
-using FinCtrlLibrary.Models;
+using FinCtrlLibrary.Models.GenericModels;
 using FinCtrlLibrary.Validators;
 
 namespace FinCtrl.Test.Models.Constructors

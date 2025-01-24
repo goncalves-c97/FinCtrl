@@ -10,7 +10,7 @@ namespace FinCtrl.Test.Models.Constructors
         {
             int id = 1;
             DateTime dateTime = DateTime.Now;
-            int spendingPaymentCategoryId = 2;
+            int paymentCategoryId = 2;
             int installments = 3;
             int? categoryId = 4;
             List<int>? tagIds = [1, 2, 3, 4];
@@ -22,7 +22,7 @@ namespace FinCtrl.Test.Models.Constructors
             bool paid = false;
             bool validation = true;
 
-            SpendingRecord spendingRecord = new(id, dateTime, spendingPaymentCategoryId, installments, categoryId, tagIds, description, discountRecordsIds, unitValue, originalValue, ruleId, paid);
+            SpendingRecord spendingRecord = new(id, dateTime, paymentCategoryId, installments, categoryId, tagIds, description, discountRecordsIds, unitValue, originalValue, ruleId, paid);
 
             Assert.Equal(validation, spendingRecord.IsValid);
         }
@@ -32,7 +32,7 @@ namespace FinCtrl.Test.Models.Constructors
         {
             int id = 1;
             DateTime dateTime = DateTime.Now;
-            int spendingPaymentCategoryId = 2;
+            int paymentCategoryId = 2;
             int installments = 3;
             int? categoryId = null;
             List<int>? tagIds = null;
@@ -44,7 +44,7 @@ namespace FinCtrl.Test.Models.Constructors
             bool paid = false;
             bool validation = true;
 
-            SpendingRecord spendingRecord = new(id, dateTime, spendingPaymentCategoryId, installments, categoryId,
+            SpendingRecord spendingRecord = new(id, dateTime, paymentCategoryId, installments, categoryId,
                 tagIds, description, discountRecordsIds, unitValue, originalValue, ruleId, paid);
 
             Assert.Equal(validation, spendingRecord.IsValid);
@@ -55,7 +55,7 @@ namespace FinCtrl.Test.Models.Constructors
         {
             int id = -1;
             DateTime dateTime = DateTime.Now;
-            int spendingPaymentCategoryId = -2;
+            int paymentCategoryId = -2;
             int installments = 3;
             int? categoryId = -4;
             List<int>? tagIds = [-1, 2, 3, 4];
@@ -67,12 +67,12 @@ namespace FinCtrl.Test.Models.Constructors
             bool paid = false;
             bool validation = false;
 
-            SpendingRecord spendingRecord = new(id, dateTime, spendingPaymentCategoryId, installments, categoryId,
+            SpendingRecord spendingRecord = new(id, dateTime, paymentCategoryId, installments, categoryId,
                 tagIds, description, discountRecordsIds, unitValue, originalValue, ruleId, paid);
 
             Assert.Equal(validation, spendingRecord.IsValid);
             Assert.True(spendingRecord.ContainsError(GenericErrors.NegativeIdError, nameof(spendingRecord.Id)));
-            Assert.True(spendingRecord.ContainsError(GenericErrors.NegativeIdError, nameof(spendingRecord.SpendingPaymentCategoryId)));
+            Assert.True(spendingRecord.ContainsError(GenericErrors.NegativeIdError, nameof(spendingRecord.PaymentCategoryId)));
             Assert.True(spendingRecord.ContainsError(GenericErrors.NegativeIdError, nameof(spendingRecord.CategoryId)));
             Assert.True(spendingRecord.ContainsError(GenericErrors.NegativeIdError, nameof(spendingRecord.TagIds)));
             Assert.True(spendingRecord.ContainsError(GenericErrors.NegativeIdError, nameof(spendingRecord.DiscountRecordsIds)));
@@ -84,7 +84,7 @@ namespace FinCtrl.Test.Models.Constructors
         {
             int id = 1;
             DateTime dateTime = DateTime.Now;
-            int spendingPaymentCategoryId = 2;
+            int paymentCategoryId = 2;
             int installments = -3;
             int? categoryId = 4;
             List<int>? tagIds = [1, 2, 3, 4];
@@ -96,7 +96,7 @@ namespace FinCtrl.Test.Models.Constructors
             bool paid = false;
             bool validation = false;
 
-            SpendingRecord spendingRecord = new(id, dateTime, spendingPaymentCategoryId, installments, categoryId,
+            SpendingRecord spendingRecord = new(id, dateTime, paymentCategoryId, installments, categoryId,
                 tagIds, description, discountRecordsIds, unitValue, originalValue, ruleId, paid);
 
             Assert.Equal(validation, spendingRecord.IsValid);
