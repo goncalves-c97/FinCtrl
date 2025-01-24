@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using static FinCtrlLibrary.Utilities.ProjEnumerators;
 using System.IO;
 using System.Globalization;
+using System.Net;
+using FinCtrlLibrary.Models.GenericModels;
 
 namespace FinCtrlApi.Controllers
 {
@@ -12,26 +14,6 @@ namespace FinCtrlApi.Controllers
     [Route("[controller]")]
     public class TestController : ControllerBase
     {
-        [HttpGet, Route("GetList")]
-        public ActionResult<Category> GetList([FromServices] ICategory categoryRepo)
-        {
-            return Ok(categoryRepo.GetList());
-        }
-
-        [HttpPost, Route("InsertNewMock")]
-        public ActionResult InsertNewMock([FromServices] ICategory categoryRepo)
-        {
-            categoryRepo.InsertNew(new Category(1, "New Fiesta"));
-            return Ok();
-        }
-
-        [HttpDelete, Route("DeleteById/{id}")]
-        public ActionResult InsertNewMock(int id, [FromServices] ICategory categoryRepo)
-        {
-            categoryRepo.DeleteById(id);
-            return Ok();
-        }
-
         [HttpGet, Route("CalculateWorkTimeForPayment/{paidValue}")]
         public ActionResult CalculateWorkTimeForPayment(double paidValue)
         {
@@ -58,11 +40,92 @@ namespace FinCtrlApi.Controllers
         [HttpGet, Route("ProcessBrute")]
         public ActionResult ProcessBrute()
         {
+            try
+            {
+                return Ok(GetRawData());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpPut, Route("PopulateDatabase")]
+        public async Task<ActionResult> PopulateDatabase([FromServices] IGenericRepository<SpendingCategory> spendingCategoryRepo,
+            [FromServices] IGenericRepository<PaymentCategory> paymentCategoryRepo,
+            [FromServices] IGenericRepository<TagCategory> tagCategoryRepo,
+            [FromServices] IGenericRepository<SpendingRule> spendingRuleRepo)
+        {
+            try
+            {
+                List<SpendingCategory> spendingCategoriesDtb = await spendingCategoryRepo.GetListAsync();
+                List<TagCategory> tagCategoriesDtb = await tagCategoryRepo.GetListAsync();
+                List<PaymentCategory> paymentCategoryDtb = await paymentCategoryRepo.GetListAsync();
+                List<SpendingRule> spendingRulesDtb = await spendingRuleRepo.GetListAsync();
+
+                List<SpendingRecord> spendingRecords = GetRawData();
+
+                List<SpendingCategory> spendingCategories = spendingRecords
+                    .Select(x => x.Category)
+                    .DistinctBy(x => x.Id)
+                    .ToList();
+
+                foreach (SpendingCategory category in spendingCategories)
+                {
+                    if (spendingCategoriesDtb.FirstOrDefault(x => x.Name.Equals(category.Name, StringComparison.InvariantCultureIgnoreCase)) == null)
+                        await spendingCategoryRepo.InsertNewAsync(category);
+                }
+
+                List<TagCategory> tagCategories = spendingRecords
+                    .SelectMany(x => x.Tags)
+                    .DistinctBy(x => x.Id)
+                    .ToList();
+
+                foreach (TagCategory category in tagCategories)
+                {
+                    if (tagCategoriesDtb.FirstOrDefault(x => x.Name.Equals(category.Name, StringComparison.InvariantCultureIgnoreCase)) == null)
+                        await tagCategoryRepo.InsertNewAsync(category);
+                }
+
+                List<PaymentCategory> paymentCategories = spendingRecords
+                    .Select(x => x.PaymentCategory)
+                    .DistinctBy(x => x.Id)
+                    .ToList();
+
+                foreach (PaymentCategory category in paymentCategories)
+                {
+                    if (paymentCategoryDtb.FirstOrDefault(x => x.Name.Equals(category.Name, StringComparison.InvariantCultureIgnoreCase)) == null)
+                        await paymentCategoryRepo.InsertNewAsync(category);
+                }
+
+                List<SpendingRule> spendingRules = spendingRecords
+                    .Where(x => x.SpendingRule != null)
+                    .Select(x => x.SpendingRule)
+                    .DistinctBy(x => x.Id)
+                    .ToList();
+
+                foreach (SpendingRule rule in spendingRules)
+                {
+                    if (spendingRulesDtb.FirstOrDefault(x => x.Name.Equals(rule.Name, StringComparison.InvariantCultureIgnoreCase)) == null)
+                        await spendingRuleRepo.InsertNewAsync(rule);
+                }
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [NonAction]
+        public List<SpendingRecord> GetRawData()
+        {
             string[] fileContent = System.IO.File.ReadAllLines("C:\\Users\\carlos\\Documents\\Pessoal\\FinCtrl\\Brute.txt");
 
-            List<Category> categories = [];
-            List<Category> spendingCategories = [];
-            List<Category> tags = [];
+            List<SpendingCategory> categories = [];
+            List<PaymentCategory> paymentCategories = [];
+            List<TagCategory> tags = [];
             List<SpendingRule> spendingRules =
                 [
                     new (1, "DIV/2 PAIS", $"{SpendingRule.StringValueForReplacing} / 2"),
@@ -92,9 +155,8 @@ namespace FinCtrlApi.Controllers
                     string rawDiscount = columns[5];
                     string rawInstallment = columns[6];
                     string rawRule = columns[7];
-                    string rawSpendingCategory = columns[8];
+                    string rawPaymentCategory = columns[8];
                     string rawTotalValue = columns[9];
-
 
                     DateTime date = minDate.AddDays(int.Parse(rawDate) - 2); //TODO estudar o -2
                     string category = rawCategory;
@@ -104,18 +166,18 @@ namespace FinCtrlApi.Controllers
                     double discount = string.IsNullOrEmpty(rawDiscount) ? 0 : double.Parse(rawDiscount, new CultureInfo("pt-BR"));
                     int installment = string.IsNullOrEmpty(rawInstallment) ? 1 : int.Parse(rawInstallment, new CultureInfo("pt-BR"));
                     string rule = rawRule;
-                    string spendingCategory = string.IsNullOrEmpty(rawSpendingCategory) ? "Não informado" : rawSpendingCategory;
+                    string paymentCategory = string.IsNullOrEmpty(rawPaymentCategory) ? "Não informado" : rawPaymentCategory;
                     double totalValue = string.IsNullOrEmpty(rawTotalValue) ? 0 : double.Parse(rawTotalValue, new CultureInfo("pt-BR"));
 
-                    Category? categoryObj = HandleNewCategoryByName(category, ref categories);
+                    SpendingCategory? categoryObj = HandleNewCategoryByName(category, ref categories);
 
-                    Category spendingCategoryObj = HandleNewCategoryByName(spendingCategory, ref spendingCategories)!;
+                    PaymentCategory paymentCategoryObj = HandleNewPaymentCategoryByName(paymentCategory, ref paymentCategories)!;
 
-                    Category? tagObj = HandleNewCategoryByName(tag, ref tags);
+                    TagCategory? tagObj = HandleNewTagCategoryByName(tag, ref tags);
 
                     SpendingRule? spendingRule = spendingRules.FirstOrDefault(x => x.Name == rule);
 
-                    SpendingRecord spendingRecord = new(spendingRecordId++, date, spendingCategoryObj, installment, categoryObj, tagObj, description, null, unitValue, totalValue, spendingRule, true);
+                    SpendingRecord spendingRecord = new(spendingRecordId++, date, paymentCategoryObj, installment, categoryObj, tagObj, description, null, unitValue, totalValue, spendingRule, true);
 
                     DiscountRecord discountRecord;
 
@@ -130,7 +192,7 @@ namespace FinCtrlApi.Controllers
 
                         discountRecords.Add(discountRecord);
 
-                        if(spendingRecord.DiscountRecordsIds == null || spendingRecord.DiscountRecords == null)
+                        if (spendingRecord.DiscountRecordsIds == null || spendingRecord.DiscountRecords == null)
                         {
                             spendingRecord.DiscountRecords = [];
                             spendingRecord.DiscountRecordsIds = [];
@@ -147,20 +209,56 @@ namespace FinCtrlApi.Controllers
                 }
                 catch (Exception ex)
                 {
-                    return StatusCode(500, $"Falha no processamento da linha: {line}. {ex.Message}");
+                    throw new Exception($"Falha no processamento da linha: {line}. {ex.Message}");
                 }
             }
 
-            return Ok(spendingRecords);
+            return spendingRecords;
         }
 
         [NonAction]
-        private Category? HandleNewCategoryByName(string categoryName, ref List<Category> category)
+        private SpendingCategory? HandleNewCategoryByName(string categoryName, ref List<SpendingCategory> category)
         {
             if (string.IsNullOrEmpty(categoryName))
                 return null;
 
-            Category? categoryObj = category.FirstOrDefault(x => x.Name == categoryName);
+            SpendingCategory? categoryObj = category.FirstOrDefault(x => x.Name == categoryName);
+
+            if (categoryObj == null)
+            {
+                int newCategoryId = category.Count == 0 ? 1 : category.Max(x => x.Id) + 1;
+                categoryObj = new(newCategoryId, categoryName);
+                category.Add(categoryObj);
+            }
+
+            return categoryObj;
+        }
+
+        [NonAction]
+        private TagCategory? HandleNewTagCategoryByName(string categoryName, ref List<TagCategory> category)
+        {
+            if (string.IsNullOrEmpty(categoryName))
+                return null;
+
+            TagCategory? categoryObj = category.FirstOrDefault(x => x.Name == categoryName);
+
+            if (categoryObj == null)
+            {
+                int newCategoryId = category.Count == 0 ? 1 : category.Max(x => x.Id) + 1;
+                categoryObj = new(newCategoryId, categoryName);
+                category.Add(categoryObj);
+            }
+
+            return categoryObj;
+        }
+
+        [NonAction]
+        private PaymentCategory? HandleNewPaymentCategoryByName(string categoryName, ref List<PaymentCategory> category)
+        {
+            if (string.IsNullOrEmpty(categoryName))
+                return null;
+
+            PaymentCategory? categoryObj = category.FirstOrDefault(x => x.Name == categoryName);
 
             if (categoryObj == null)
             {
