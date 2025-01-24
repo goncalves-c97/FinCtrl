@@ -1,4 +1,5 @@
-﻿using FinCtrlLibrary.Validators;
+﻿using FinCtrlLibrary.Models.GenericModels;
+using FinCtrlLibrary.Validators;
 
 namespace FinCtrlLibrary.Models
 {
