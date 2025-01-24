@@ -16,7 +16,7 @@ namespace FinCtrlLibrary.Models
         [BsonIgnore]
         public long Id { get; set; }
         public DateTime DateTime { get; set; }
-        public int SpendingPaymentCategoryId { get; set; }
+        public int PaymentCategoryId { get; set; }
         public int Installments { get; set; }
         [BsonIgnore]
         public int? CategoryId { get; set; }
@@ -36,11 +36,11 @@ namespace FinCtrlLibrary.Models
         public bool Paid { get; set; }
 
         [BsonIgnore]
-        public Category SpendingPaymentCategory { get; set; }
+        public PaymentCategory PaymentCategory { get; set; }
         [BsonIgnore]
-        public Category? Category { get; set; }
+        public SpendingCategory? Category { get; set; }
         [BsonIgnore]
-        public List<Category>? Tags { get; set; } = [];
+        public List<TagCategory>? Tags { get; set; } = [];
         [BsonIgnore]
         public List<DiscountRecord>? DiscountRecords { get; set; } = [];
         [BsonIgnore]
@@ -51,12 +51,12 @@ namespace FinCtrlLibrary.Models
 
         }
 
-        public SpendingRecord(int id, DateTime dateTime, int spendingPaymentCategoryId, int installments, int? categoryId,
+        public SpendingRecord(int id, DateTime dateTime, int paymentCategoryId, int installments, int? categoryId,
             List<int>? tagIds, string description, List<long>? discountRecordsIds, double unitValue, double originalValue, int? ruleId, bool paid)
         {
             Id = id;
             DateTime = dateTime;
-            SpendingPaymentCategoryId = spendingPaymentCategoryId;
+            PaymentCategoryId = paymentCategoryId;
             Installments = installments;
             CategoryId = categoryId;
             TagIds = tagIds;
@@ -69,16 +69,16 @@ namespace FinCtrlLibrary.Models
             Validate();
         }
 
-        public SpendingRecord(int id, DateTime dateTime, Category spendingPaymentCategory, int installments, Category? category,
-            Category? tag, string description, List<DiscountRecord>? discountRecords, double unitValue, double originalValue, SpendingRule? rule, bool paid)
+        public SpendingRecord(int id, DateTime dateTime, PaymentCategory paymentCategory, int installments, SpendingCategory? category,
+            TagCategory? tag, string description, List<DiscountRecord>? discountRecords, double unitValue, double originalValue, SpendingRule? rule, bool paid)
         {
             Id = id;
             DateTime = dateTime;
 
-            if (spendingPaymentCategory != null)
+            if (paymentCategory != null)
             {
-                SpendingPaymentCategoryId = spendingPaymentCategory.Id;
-                SpendingPaymentCategory = spendingPaymentCategory;
+                PaymentCategoryId = paymentCategory.Id;
+                PaymentCategory = paymentCategory;
             }
 
             Installments = installments;
@@ -119,7 +119,7 @@ namespace FinCtrlLibrary.Models
         protected override void Validate()
         {
             IdValidation(Id, nameof(Id));
-            IdValidation(SpendingPaymentCategoryId, nameof(SpendingPaymentCategoryId), true);
+            IdValidation(PaymentCategoryId, nameof(PaymentCategoryId), true);
             PositiveValueValidation(nameof(Installments), Installments);
 
             if (CategoryId != null)

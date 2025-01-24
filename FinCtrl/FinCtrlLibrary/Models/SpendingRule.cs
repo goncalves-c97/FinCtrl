@@ -1,21 +1,27 @@
 ﻿using FinCtrlLibrary.Exceptions;
+using FinCtrlLibrary.Interfaces;
 using FinCtrlLibrary.Validators;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using System.Xml.XPath;
 
 namespace FinCtrlLibrary.Models
 {
-    public class SpendingRule : ValidatorClass
+    public class SpendingRule : ValidatorClass, IMongoDbItem
     {
         private const int _nameMaxLength = 30;
         private const int _ruleMaxLength = 100;
         private const string _stringValueForReplacing = "{0}";
 
+        [BsonId]
+        public ObjectId _id { get; set; }
         public int Id { get; set; }
         public string Name { get; set; }
         public string Rule { get; set; }
         public static string StringValueForReplacing => _stringValueForReplacing;
+
 
         public SpendingRule(int id, string name, string rule)
         {
