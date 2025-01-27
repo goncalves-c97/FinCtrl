@@ -1,4 +1,5 @@
-﻿using FinCtrlLibrary.Validators;
+﻿using FinCtrlLibrary.Interfaces;
+using FinCtrlLibrary.Validators;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System.ComponentModel.DataAnnotations;
@@ -7,30 +8,32 @@ using System.Text.Json.Serialization;
 
 namespace FinCtrlLibrary.Models
 {
-    public class SpendingRecord : ValidatorClass
+    public class SpendingRecord : ValidatorClass, IMongoDbItem
     {
         private const int _descriptionMaxLength = 100;
 
         [BsonId]
         public ObjectId _id { get; set; }
-        [BsonIgnore]
+        [JsonIgnore, BsonIgnore]
         public long Id { get; set; }
         public DateTime DateTime { get; set; }
+        public string PaymentCategoryBsonId { get; set; }
+        [BsonIgnore]
         public int PaymentCategoryId { get; set; }
         public int Installments { get; set; }
-        [BsonIgnore]
+        [JsonIgnore, BsonIgnore]
         public int? CategoryId { get; set; }
         public string? CategoryBsonId { get; set; }
-        [BsonIgnore]
+        [JsonIgnore, BsonIgnore]
         public List<int>? TagIds { get; set; } = [];
-        public List<int>? TagBsonIds { get; set; } = [];
+        public List<string>? TagBsonIds { get; set; } = [];
         public string Description { get; set; }
-        [BsonIgnore]
+        [JsonIgnore, BsonIgnore]
         public List<long>? DiscountRecordsIds { get; set; } = [];
         public List<long>? DiscountRecordsBsonIds { get; set; } = [];
         public double UnitValue { get; set; }
         public double OriginalValue { get; set; }
-        [BsonIgnore]
+        [JsonIgnore, BsonIgnore]
         public int? SpendingRuleId { get; set; }
         public string? SpendingRuleBsonId { get; set; }
         public bool Paid { get; set; }
@@ -165,6 +168,20 @@ namespace FinCtrlLibrary.Models
 
             if (SpendingRuleId != null)
                 IdValidation((int)SpendingRuleId, nameof(SpendingRuleId), true);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            bool isSpendingRecord = obj is SpendingRecord;
+
+            SpendingRecord spendingRecord = obj as SpendingRecord;
+
+            return isSpendingRecord && DateTime.ToShortDateString() == spendingRecord.DateTime.ToShortDateString() && Description.Equals(spendingRecord.Description, StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        public override string ToString()
+        {
+            return $"{DateTime.ToShortDateString()} - {(Category != null ? Category.Name : CategoryBsonId)} - {Description}";
         }
     }
 }
