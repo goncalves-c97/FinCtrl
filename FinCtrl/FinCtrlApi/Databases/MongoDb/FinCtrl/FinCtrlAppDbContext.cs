@@ -27,11 +27,11 @@ namespace FinCtrlApi.Databases.MongoDb.FinCtrl
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<SpendingCategory>().ToCollection("spendingCategories");
-            modelBuilder.Entity<PaymentCategory>().ToCollection("paymentCategories");
-            modelBuilder.Entity<TagCategory>().ToCollection("tagCategories");
-            modelBuilder.Entity<SpendingRule>().ToCollection("spendingRule");
-            modelBuilder.Entity<SpendingRecord>().ToCollection("spendingRecords");
+            modelBuilder.Entity<SpendingCategory>().ToCollection("spending_categories");
+            modelBuilder.Entity<PaymentCategory>().ToCollection("payment_categories");
+            modelBuilder.Entity<TagCategory>().ToCollection("tag_categories");
+            modelBuilder.Entity<SpendingRule>().ToCollection("spending_rule");
+            modelBuilder.Entity<SpendingRecord>().ToCollection("spending_records");
         }
     }
 

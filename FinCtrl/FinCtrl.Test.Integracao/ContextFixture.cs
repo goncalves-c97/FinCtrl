@@ -24,7 +24,7 @@ namespace FinCtrl.Test.Integracao
                 throw new Exception("Não foi possível obter a string de conexão ao MongoDb");
 
             var options = new DbContextOptionsBuilder<FinCtrlAppDbContext>()
-                .UseMongoDB(mongoDbConnectionString, "FinCtrl")
+                .UseMongoDB(mongoDbConnectionString, "finctrl_test_dtb")
                 .Options;
 
             Context = new FinCtrlAppDbContext(options);
