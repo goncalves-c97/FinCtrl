@@ -7,6 +7,9 @@ using System.IO;
 using System.Globalization;
 using System.Net;
 using FinCtrlLibrary.Models.GenericModels;
+using System.Linq;
+using DnsClient.Protocol;
+using Newtonsoft.Json;
 
 namespace FinCtrlApi.Controllers
 {
@@ -54,7 +57,8 @@ namespace FinCtrlApi.Controllers
         public async Task<ActionResult> PopulateDatabase([FromServices] IGenericRepository<SpendingCategory> spendingCategoryRepo,
             [FromServices] IGenericRepository<PaymentCategory> paymentCategoryRepo,
             [FromServices] IGenericRepository<TagCategory> tagCategoryRepo,
-            [FromServices] IGenericRepository<SpendingRule> spendingRuleRepo)
+            [FromServices] IGenericRepository<SpendingRule> spendingRuleRepo,
+            [FromServices] ISpendingRecordRepository spendingRecordRepo)
         {
             try
             {
@@ -62,6 +66,7 @@ namespace FinCtrlApi.Controllers
                 List<TagCategory> tagCategoriesDtb = await tagCategoryRepo.GetListAsync();
                 List<PaymentCategory> paymentCategoryDtb = await paymentCategoryRepo.GetListAsync();
                 List<SpendingRule> spendingRulesDtb = await spendingRuleRepo.GetListAsync();
+                List<SpendingRecord> spendingRecordsDtb = await spendingRecordRepo.GetListAsync();
 
                 List<SpendingRecord> spendingRecords = GetRawData();
 
@@ -73,7 +78,10 @@ namespace FinCtrlApi.Controllers
                 foreach (SpendingCategory category in spendingCategories)
                 {
                     if (spendingCategoriesDtb.FirstOrDefault(x => x.Name.Equals(category.Name, StringComparison.InvariantCultureIgnoreCase)) == null)
+                    {
                         await spendingCategoryRepo.InsertNewAsync(category);
+                        spendingCategoriesDtb.Add(category);
+                    }
                 }
 
                 List<TagCategory> tagCategories = spendingRecords
@@ -84,7 +92,10 @@ namespace FinCtrlApi.Controllers
                 foreach (TagCategory category in tagCategories)
                 {
                     if (tagCategoriesDtb.FirstOrDefault(x => x.Name.Equals(category.Name, StringComparison.InvariantCultureIgnoreCase)) == null)
+                    {
                         await tagCategoryRepo.InsertNewAsync(category);
+                        tagCategoriesDtb.Add(category);
+                    }
                 }
 
                 List<PaymentCategory> paymentCategories = spendingRecords
@@ -95,7 +106,10 @@ namespace FinCtrlApi.Controllers
                 foreach (PaymentCategory category in paymentCategories)
                 {
                     if (paymentCategoryDtb.FirstOrDefault(x => x.Name.Equals(category.Name, StringComparison.InvariantCultureIgnoreCase)) == null)
+                    {
                         await paymentCategoryRepo.InsertNewAsync(category);
+                        paymentCategoryDtb.Add(category);
+                    }
                 }
 
                 List<SpendingRule> spendingRules = spendingRecords
@@ -107,7 +121,34 @@ namespace FinCtrlApi.Controllers
                 foreach (SpendingRule rule in spendingRules)
                 {
                     if (spendingRulesDtb.FirstOrDefault(x => x.Name.Equals(rule.Name, StringComparison.InvariantCultureIgnoreCase)) == null)
+                    {
                         await spendingRuleRepo.InsertNewAsync(rule);
+                        spendingRulesDtb.Add(rule); 
+                    }
+                }
+
+                foreach (SpendingRecord record in spendingRecords)
+                {
+                    if (record.Category != null)
+                    {
+                        SpendingCategory? recordCategory = spendingCategoriesDtb.FirstOrDefault(x => x.Name.Equals(record.Category.Name));
+                        record.CategoryBsonId = recordCategory._id.ToString();
+                    }
+
+                    if (record.Tags != null && record.Tags.Count > 0)
+                    {
+                        TagCategory? tagCategory = tagCategoriesDtb.FirstOrDefault(x => x.Name.Equals(record.Tags[0].Name));
+                        record.TagBsonIds = [tagCategory._id.ToString()];
+                    }
+
+                    if (record.PaymentCategory != null)
+                    {
+                        PaymentCategory? paymentCategory = paymentCategoryDtb.FirstOrDefault(x => x.Name.Equals(record.PaymentCategory.Name));
+                        record.PaymentCategoryBsonId = paymentCategory._id.ToString();
+                    }
+
+                    if (spendingRecordsDtb.FirstOrDefault(x => x.Equals(record)) == null)
+                        await spendingRecordRepo.InsertNewAsync(record);
                 }
 
                 return Ok();
@@ -118,6 +159,69 @@ namespace FinCtrlApi.Controllers
             }
         }
 
+        [HttpGet, Route("GetSpendingRecordsStatistics")]
+        public async Task<ActionResult> GetSpendingRecordsStatistics(
+            [FromServices] IGenericRepository<SpendingCategory> spendingCategoryRepo,
+            [FromServices] IGenericRepository<PaymentCategory> paymentCategoryRepo,
+            [FromServices] IGenericRepository<TagCategory> tagCategoryRepo,
+            [FromServices] IGenericRepository<SpendingRule> spendingRuleRepo, 
+            [FromServices] ISpendingRecordRepository spendingRecordRepo)
+        {
+            try
+            {
+                List<SpendingRecord> spendingRecords = await spendingRecordRepo.GetListWithIncludesAsync(spendingCategoryRepo, paymentCategoryRepo, tagCategoryRepo, spendingRuleRepo);
+
+                string totalSpent = GetRealValue(spendingRecords.Sum(x => x.OriginalValue));
+                string averageSpent = GetRealValue(spendingRecords.Average(x => x.OriginalValue));
+
+                var valuesPerMonth = spendingRecords
+                    .GroupBy(r => new { r.DateTime.Year, r.DateTime.Month })
+                    .Select(g => new
+                    {
+                        g.Key.Year,
+                        g.Key.Month,
+                        TotalValue = GetRealValue(g.Sum(r => r.OriginalValue))
+                    })
+                    .OrderByDescending(x => x.Year)
+                    .ThenByDescending(x => x.Month)
+                    .ToList();
+
+                string averageValuePerMonth = GetRealValue(spendingRecords.Sum(x => x.OriginalValue) / valuesPerMonth.Count());
+
+                List<SpendingRecord> top10Buys = spendingRecords.OrderByDescending(x => x.OriginalValue).Take(10).ToList();
+
+                var top10Categories = spendingRecords
+                    .GroupBy(r => r.Category)
+                    .Select(g => new
+                    {
+                        Category = g.Key,
+                        TotalValue = g.Sum(r => r.OriginalValue),
+                        TotalValueFormatted = GetRealValue(g.Sum(r => r.OriginalValue))
+                    })
+                    .OrderByDescending(x => x.TotalValue)
+                    .Take(10);
+
+                return Ok(JsonConvert.SerializeObject(new
+                {
+                    totalSpent,
+                    valuesPerMonth,
+                    averageValuePerMonth,
+                    averageSpent,
+                    top10Buys,
+                    top10Categories
+                }, Formatting.Indented, new JsonSerializerSettings { DefaultValueHandling = DefaultValueHandling.Ignore, NullValueHandling = NullValueHandling.Ignore }));
+            }
+            catch(Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [NonAction]
+        public string GetRealValue(double value)
+        {
+            return value.ToString("C", new CultureInfo("pt-BR"));
+        }
         [NonAction]
         public List<SpendingRecord> GetRawData()
         {
