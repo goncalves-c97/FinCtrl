@@ -3,6 +3,7 @@ using FinCtrlApi.Utilities;
 using FinCtrlLibrary.Interfaces;
 using FinCtrlLibrary.Models.GenericModels;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Bson;
 using System.Xml.Linq;
 
 namespace FinCtrlApi.Databases.MongoDb.FinCtrl.Repositories
@@ -31,7 +32,7 @@ namespace FinCtrlApi.Databases.MongoDb.FinCtrl.Repositories
             return await ProjPolicies.ExecuteWithRetryAsync(() =>
                 _context.Set<T>()
                     .AsNoTracking()
-                    .FirstOrDefaultAsync(x => EF.Property<string>(x, nameof(IMongoDbItem._id)).Equals(id, StringComparison.CurrentCultureIgnoreCase))
+                    .FirstOrDefaultAsync(x => EF.Property<ObjectId>(x, nameof(IMongoDbItem._id)).ToString().Equals(id, StringComparison.CurrentCultureIgnoreCase))
             );
         }
 
