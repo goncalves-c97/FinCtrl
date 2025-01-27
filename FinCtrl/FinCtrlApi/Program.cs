@@ -28,7 +28,7 @@ if (mongoDbConnectionString == null)
 
 // Add services to the container.
 builder.Services.AddDbContextPool<FinCtrlAppDbContext>(
-    options => options.UseMongoDB(mongoDbConnectionString, "FinCtrl"));
+    options => options.UseMongoDB(mongoDbConnectionString, "finctrl_dtb"));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -39,6 +39,7 @@ builder.Services.AddScoped<IGenericRepository<SpendingCategory>, GenericReposito
 builder.Services.AddScoped<IGenericRepository<PaymentCategory>, GenericRepository<PaymentCategory>>();
 builder.Services.AddScoped<IGenericRepository<TagCategory>, GenericRepository<TagCategory>>();
 builder.Services.AddScoped<IGenericRepository<SpendingRule>, GenericRepository<SpendingRule>>();
+builder.Services.AddScoped<ISpendingRecordRepository, SpendingRecordRepository>();
 
 var app = builder.Build();
 
