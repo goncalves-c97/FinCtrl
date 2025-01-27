@@ -28,6 +28,14 @@ namespace FinCtrlLibrary.Models.GenericModels
             Validate();
         }
 
+        public Category(string bsonId, string name)
+        {
+            Id = 0;
+            _id = ObjectId.Parse(bsonId);
+            Name = name;
+            Validate();
+        }
+
         public Category(int id, string name)
         {
             Id = id;
