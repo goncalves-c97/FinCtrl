@@ -49,7 +49,7 @@ namespace FinCtrlLibrary.Validators
         [BsonIgnore]
         public Enum ErrorEnum { get; set; }
         [BsonIgnore]
-        public string?[] PropertiesNames { get; set; }
+        public string?[] PropertyNames { get; set; }
         [BsonIgnore]
         public string Message { get; set; }
         [BsonIgnore]
@@ -59,10 +59,10 @@ namespace FinCtrlLibrary.Validators
             {
                 StringBuilder sb = new StringBuilder();
 
-                if (PropertiesNames == null || PropertiesNames.Length == 0)
+                if (PropertyNames == null || PropertyNames.Length == 0)
                     return string.Empty;
 
-                foreach (string propertyName in PropertiesNames)
+                foreach (string propertyName in PropertyNames)
                 {
                     sb.Append($", {propertyName}");
                 }
@@ -79,7 +79,7 @@ namespace FinCtrlLibrary.Validators
         public Error(Enum errorEnum, string message, params string[] propertyName) : this()
         {
             ErrorEnum = errorEnum;
-            PropertiesNames = propertyName;
+            PropertyNames = propertyName;
             Message = message;
         }
     }
@@ -113,8 +113,10 @@ namespace FinCtrlLibrary.Validators
         protected abstract void Validate();
 
         public bool ContainsError(Enum errorEnum) => errors.Any(x => x.ErrorEnum.ToString() == errorEnum.ToString());
-        public bool ContainsError(Enum errorEnum, string propertyName) => errors.Any(x => x.ErrorEnum.ToString() == errorEnum.ToString() && x.PropertiesNames.Contains(propertyName));
-        public bool ContainsError(int enumValue, string propertyName) => errors.Any(x => Convert.ToInt32(x.ErrorEnum) == enumValue && x.PropertiesNames.Contains(propertyName));
+        public bool ContainsError(Enum errorEnum, string propertyName) => errors.Any(x => x.ErrorEnum.ToString() == errorEnum.ToString() && x.PropertyNames.Contains(propertyName));
+        public bool ContainsError(int enumValue, string propertyName) => errors.Any(x => Convert.ToInt32(x.ErrorEnum) == enumValue && x.PropertyNames.Contains(propertyName));
+        public bool ContainsError(Enum errorEnum, string[] propertyNames) => errors.Any(x => x.ErrorEnum.ToString() == errorEnum.ToString() && x.PropertyNames.Intersect(propertyNames).Any());
+        public bool ContainsError(int enumValue, string[] propertyNames) => errors.Any((x => Convert.ToInt32(x.ErrorEnum) == enumValue && x.PropertyNames.Intersect(propertyNames).Any()));
 
         protected void IdValidation(int id, string? propertyName = null, bool validateZero = false)
         {
