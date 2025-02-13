@@ -12,6 +12,8 @@ namespace FinCtrlApi.Databases.MongoDb.FinCtrl
         public DbSet<TagCategory> TagCategories { get; init; }
         public DbSet<SpendingRule> SpendingRule { get; init; }
         public DbSet<SpendingRecord> SpendingRecords { get; init; }
+        public DbSet<EarningCategory> EarningCategories { get; init; }
+        public DbSet<EarningRecord> EarningRecords { get; init; }
 
         public static FinCtrlAppDbContext Create(IMongoDatabase database) =>
             new(new DbContextOptionsBuilder<FinCtrlAppDbContext>()
@@ -32,6 +34,8 @@ namespace FinCtrlApi.Databases.MongoDb.FinCtrl
             modelBuilder.Entity<TagCategory>().ToCollection("tag_categories");
             modelBuilder.Entity<SpendingRule>().ToCollection("spending_rule");
             modelBuilder.Entity<SpendingRecord>().ToCollection("spending_records");
+            modelBuilder.Entity<EarningCategory>().ToCollection("earning_categories");
+            modelBuilder.Entity<EarningRecord>().ToCollection("earning_records");
         }
     }
 

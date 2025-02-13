@@ -1,4 +1,5 @@
-﻿using FinCtrlLibrary.Models.GenericModels;
+﻿using FinCtrlLibrary.Interfaces;
+using FinCtrlLibrary.Models.GenericModels;
 
 namespace FinCtrlLibrary.Models
 {

@@ -39,7 +39,10 @@ builder.Services.AddScoped<IGenericRepository<SpendingCategory>, GenericReposito
 builder.Services.AddScoped<IGenericRepository<PaymentCategory>, GenericRepository<PaymentCategory>>();
 builder.Services.AddScoped<IGenericRepository<TagCategory>, GenericRepository<TagCategory>>();
 builder.Services.AddScoped<IGenericRepository<SpendingRule>, GenericRepository<SpendingRule>>();
+builder.Services.AddScoped<IGenericRepository<EarningCategory>, GenericRepository<EarningCategory>>();
 builder.Services.AddScoped<ISpendingRecordRepository, SpendingRecordRepository>();
+builder.Services.AddScoped<IEarningRecordRepository, EarningRecordRepository>();
+
 
 var app = builder.Build();
 

@@ -41,9 +41,9 @@ namespace FinCtrlLibrary.Models
         [BsonIgnore]
         public PaymentCategory PaymentCategory { get; set; }
         [BsonIgnore]
-        public SpendingCategory? Category { get; set; }
+        public SpendingCategory? SpendingCategory { get; set; }
         [BsonIgnore]
-        public List<TagCategory>? Tags { get; set; } = [];
+        public List<TagCategory>? TagCategories { get; set; } = [];
         [BsonIgnore]
         public List<DiscountRecord>? DiscountRecords { get; set; } = [];
         [BsonIgnore]
@@ -89,13 +89,13 @@ namespace FinCtrlLibrary.Models
             if (category != null)
             {
                 CategoryId = category.Id;
-                Category = category;
+                SpendingCategory = category;
             }
 
             if (tag != null)
             {
                 TagIds.Add(tag.Id);
-                Tags.Add(tag);
+                TagCategories.Add(tag);
             }
 
             Description = description;
@@ -181,7 +181,7 @@ namespace FinCtrlLibrary.Models
 
         public override string ToString()
         {
-            return $"{DateTime.ToShortDateString()} - {(Category != null ? Category.Name : CategoryBsonId)} - {Description}";
+            return $"{DateTime.ToShortDateString()} - {(SpendingCategory != null ? SpendingCategory.Name : CategoryBsonId)} - {Description}";
         }
     }
 }

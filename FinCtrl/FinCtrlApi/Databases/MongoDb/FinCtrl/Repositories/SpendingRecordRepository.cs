@@ -20,12 +20,12 @@ namespace FinCtrlApi.Databases.MongoDb.FinCtrl.Repositories
             {
                 SpendingCategory? spendingCategory = spendingCategories.FirstOrDefault(x => x._id.ToString() == spendingRecord.CategoryBsonId);
                 PaymentCategory? paymentCategory = paymentCategories.FirstOrDefault(x => x._id.ToString() == spendingRecord.PaymentCategoryBsonId);
-                List<TagCategory>? tagCategoriesList = tagCategories.Where(x => spendingRecord.Tags.Select(x => x._id.ToString()).ToList().Contains(x._id.ToString())).ToList();
+                List<TagCategory>? tagCategoriesList = tagCategories.Where(x => spendingRecord.TagCategories.Select(x => x._id.ToString()).ToList().Contains(x._id.ToString())).ToList();
                 SpendingRule? spendingRule = spendingRules.FirstOrDefault(x => x._id.ToString() == spendingRecord.SpendingRuleBsonId);
 
-                spendingRecord.Category = spendingCategory;
+                spendingRecord.SpendingCategory = spendingCategory;
                 spendingRecord.PaymentCategory = paymentCategory;
-                spendingRecord.Tags = tagCategoriesList;
+                spendingRecord.TagCategories = tagCategoriesList;
                 spendingRecord.SpendingRule = spendingRule;
             }
 

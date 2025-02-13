@@ -4,6 +4,7 @@ using FinCtrlLibrary.Interfaces;
 using FinCtrlLibrary.Models.GenericModels;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Bson;
+using System.Linq.Expressions;
 using System.Xml.Linq;
 
 namespace FinCtrlApi.Databases.MongoDb.FinCtrl.Repositories
@@ -53,5 +54,41 @@ namespace FinCtrlApi.Databases.MongoDb.FinCtrl.Repositories
                 await _context.SaveChangesAsync();
             });
         }
+
+        public async Task<List<T>> GetByPropertiesAsync(Dictionary<string, object> filters)
+        {
+            return await ProjPolicies.ExecuteWithRetryAsync(async () =>
+            {
+                IQueryable<T> query = _context.Set<T>().AsNoTracking();
+
+                foreach (var filter in filters)
+                {
+                    string propertyName = filter.Key;
+                    object propertyValue = filter.Value;
+
+                    var parameter = Expression.Parameter(typeof(T), "x");
+                    var property = Expression.Property(parameter, propertyName);
+
+                    var constant = Expression.Constant(propertyValue);
+                    Expression body;
+
+                    if (propertyValue is string)
+                    {
+                        var toLowerMethod = typeof(string).GetMethod("ToLower", Type.EmptyTypes);
+                        var toLowerProperty = Expression.Call(property, toLowerMethod);
+                        var toLowerConstant = Expression.Call(constant, toLowerMethod);
+                        body = Expression.Equal(toLowerProperty, toLowerConstant);
+                    }
+                    else
+                        body = Expression.Equal(property, Expression.Convert(constant, property.Type));
+
+                    var predicate = Expression.Lambda<Func<T, bool>>(body, parameter);
+                    query = query.Where(predicate);
+                }
+
+                return await query.ToListAsync();
+            });
+        }
+
     }
 }
