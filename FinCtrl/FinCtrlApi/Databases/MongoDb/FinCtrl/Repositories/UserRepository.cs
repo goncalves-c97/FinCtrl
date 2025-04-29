@@ -7,14 +7,15 @@ namespace FinCtrlApi.Databases.MongoDb.FinCtrl.Repositories
     {
         public UserRepository(FinCtrlAppDbContext context) : base(context) { }
 
-        public User GetByEmailAndPassword(string email, string password)
+        public async Task<User> GetByEmailAndPasswordAsync(string email, string password)
         {
-            throw new NotImplementedException();
-        }
+            Dictionary<string, object> filter = new()
+            {
+                {nameof(User.Email), email},
+                {nameof(User.Password), password}
+            };
 
-        public User GetByUsernameAndPassword(string username, string password)
-        {
-            throw new NotImplementedException();
+            return await GetFirstOrDefaultByPropertiesAsync(filter);
         }
     }
 }

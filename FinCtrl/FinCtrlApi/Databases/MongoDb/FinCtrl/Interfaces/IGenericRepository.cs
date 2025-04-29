@@ -9,5 +9,6 @@ namespace FinCtrlApi.Databases.MongoDb.FinCtrl.Interfaces
         public Task InsertNewAsync(T entity);
         public Task DeleteByIdAsync(string id);
         public Task<List<T>> GetByPropertiesAsync(Dictionary<string, object> filters);
+        public Task<T> GetFirstOrDefaultByPropertiesAsync(Dictionary<string, object> filters);
     }
 }
