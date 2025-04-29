@@ -71,7 +71,7 @@ namespace FinCtrlApi.Controllers
                 List<SpendingRecord> spendingRecords = GetRawData();
 
                 List<SpendingCategory> spendingCategories = spendingRecords
-                    .Select(x => x.Category)
+                    .Select(x => x.SpendingCategory)
                     .DistinctBy(x => x.Id)
                     .ToList();
 
@@ -85,7 +85,7 @@ namespace FinCtrlApi.Controllers
                 }
 
                 List<TagCategory> tagCategories = spendingRecords
-                    .SelectMany(x => x.Tags)
+                    .SelectMany(x => x.TagCategories)
                     .DistinctBy(x => x.Id)
                     .ToList();
 
@@ -129,15 +129,15 @@ namespace FinCtrlApi.Controllers
 
                 foreach (SpendingRecord record in spendingRecords)
                 {
-                    if (record.Category != null)
+                    if (record.SpendingCategory != null)
                     {
-                        SpendingCategory? recordCategory = spendingCategoriesDtb.FirstOrDefault(x => x.Name.Equals(record.Category.Name));
+                        SpendingCategory? recordCategory = spendingCategoriesDtb.FirstOrDefault(x => x.Name.Equals(record.SpendingCategory.Name));
                         record.CategoryBsonId = recordCategory._id.ToString();
                     }
 
-                    if (record.Tags != null && record.Tags.Count > 0)
+                    if (record.TagCategories != null && record.TagCategories.Count > 0)
                     {
-                        TagCategory? tagCategory = tagCategoriesDtb.FirstOrDefault(x => x.Name.Equals(record.Tags[0].Name));
+                        TagCategory? tagCategory = tagCategoriesDtb.FirstOrDefault(x => x.Name.Equals(record.TagCategories[0].Name));
                         record.TagBsonIds = [tagCategory._id.ToString()];
                     }
 
@@ -191,7 +191,7 @@ namespace FinCtrlApi.Controllers
                 List<SpendingRecord> top10Buys = spendingRecords.OrderByDescending(x => x.OriginalValue).Take(10).ToList();
 
                 var top10Categories = spendingRecords
-                    .GroupBy(r => r.Category)
+                    .GroupBy(r => r.SpendingCategory)
                     .Select(g => new
                     {
                         Category = g.Key,
@@ -225,7 +225,7 @@ namespace FinCtrlApi.Controllers
         [NonAction]
         public List<SpendingRecord> GetRawData()
         {
-            string[] fileContent = System.IO.File.ReadAllLines("C:\\Users\\carlos\\Documents\\Pessoal\\FinCtrl\\Brute.txt");
+            string[] fileContent = System.IO.File.ReadAllLines("C:\\Users\\carlo\\OneDrive\\Área de Trabalho\\Brute.txt");
 
             List<SpendingCategory> categories = [];
             List<PaymentCategory> paymentCategories = [];
