@@ -6,6 +6,9 @@ using System.Runtime.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 using System.Text.Json.Serialization;
 using MongoDB.Bson;
+using Microsoft.Extensions.ObjectPool;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
 
 namespace FinCtrlLibrary.Validators
 {
@@ -98,7 +101,10 @@ namespace FinCtrlLibrary.Validators
         InvalidObjectError,
         InvalidBsonIdError,
         SameDateTimeError,
-        StartBiggerThanEndDateTimeError
+        StartBiggerThanEndDateTimeError,
+        DateTimeBiggerThanNowError,
+        InvalidIpError,
+        InvalidTokenError
     }
 
     public abstract class ValidatorClass
@@ -224,7 +230,38 @@ namespace FinCtrlLibrary.Validators
                 Errors.RegisterError(GenericErrors.SameDateTimeError, $"'{startDateTimePropertyName}' e '{endDateTimePropertyName}' são iguais!", startDateTimePropertyName, endDateTimePropertyName);
 
             if (startDateTime > endDateTime)
-                Errors.RegisterError(GenericErrors.StartBiggerThanEndDateTimeError, $"'{startDateTime}' é maior que '{endDateTime}'", startDateTimePropertyName, endDateTimePropertyName);
+                Errors.RegisterError(GenericErrors.StartBiggerThanEndDateTimeError, $"'{startDateTimePropertyName}' é maior que '{endDateTimePropertyName}'", startDateTimePropertyName, endDateTimePropertyName);
+        }
+
+        protected void NotBiggerThanNowDateTimeValidation(string propertyName, DateTime dateTime, bool validateSameDateTimes = false)
+        {
+            DateTime utcNow = DateTime.UtcNow;
+
+            if (validateSameDateTimes && dateTime == utcNow)
+                Errors.RegisterError(GenericErrors.SameDateTimeError, $"'{propertyName}' e '{nameof(utcNow)}' são iguais!", propertyName, nameof(utcNow));
+
+            if (dateTime > utcNow)
+                Errors.RegisterError(GenericErrors.DateTimeBiggerThanNowError, $"'{propertyName}' é maior que '{nameof(utcNow)}'", propertyName, nameof(utcNow));
+        }
+
+        protected void IpValidation(string propertyName, string ip)
+        {
+            if (string.IsNullOrEmpty(ip))
+                Errors.RegisterError(GenericErrors.InvalidIpError, $"'{propertyName}' está vazio.");
+
+            string[] ipFields = ip.Split('.');
+
+            if (ipFields.Length != 4)
+                Errors.RegisterError(GenericErrors.InvalidIpError, $"'{propertyName}' não é um IP válido. Não possui os 4 campos de IP.");
+
+            foreach(string ipField in ipFields)
+            {
+                if(!byte.TryParse(ipField, out _))
+                {
+                    Errors.RegisterError(GenericErrors.InvalidIpError, $"'{propertyName}' possui um ou mais valores inválidos.");
+                    return;
+                }
+            }
         }
     }
 }
