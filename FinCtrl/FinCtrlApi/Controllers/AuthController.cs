@@ -1,5 +1,6 @@
 ﻿using FinCtrlApi.Databases.MongoDb.FinCtrl.Interfaces;
 using FinCtrlLibrary.Models;
+using FinCtrlLibrary.Models.StaticModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.EntityFrameworkCore.Storage.ValueConversion;
@@ -31,14 +32,17 @@ namespace FinCtrlApi.Controllers
                 User databaseUser = await _userRepo.GetByEmailAndPasswordAsync(user.Email, user.Password);
 
                 if (databaseUser == null)
-                    return NotFound("Email e/ou senha incorretos! Verifique e tente novamente.");
+                    return NotFound("Incorrect email and/or password! Verify and try again.");
 
                 string? currentIp = GetIpFromRequest(Request.HttpContext.Connection.RemoteIpAddress);
 
                 if (string.IsNullOrEmpty(currentIp))
-                    return BadRequest("Não foi possível obter o IP do cliente."); 
+                    return BadRequest("Unable to obtain the request IP."); 
 
                 Authentication authentication = await _authenticatonRepo.GetUserAuthenticationAsync(databaseUser, currentIp);
+
+                databaseUser.LastLogin = DateTime.UtcNow;
+                await _userRepo.UpdateAsync(databaseUser);
 
                 return Ok(authentication);
             }
@@ -47,6 +51,35 @@ namespace FinCtrlApi.Controllers
                 return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
             }
 
+        }
+
+        [HttpPost, Route("CreateCommomUser")]
+        public async Task<IActionResult> CreateUser([FromBody] User user)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState.ToString());
+
+            try
+            {
+                user.ValidateForCreation();
+
+                if (!user.IsValid)
+                    return BadRequest(user.Errors);
+
+                bool alreadyExistsUser = await _userRepo.CheckIfAlreadyExistsUserByEmail(user.Email);
+
+                if (alreadyExistsUser)
+                    return BadRequest("It already exists an user with the informed Email!");
+
+                user.Role = UserRoles.CommonUser;
+                await _userRepo.InsertNewAsync(user);
+
+                return Created();
+            }
+            catch(Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+            }
         }
 
         public static string GetIpFromRequest(IPAddress requestIpAddress)
