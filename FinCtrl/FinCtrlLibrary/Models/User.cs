@@ -22,11 +22,19 @@ namespace FinCtrlLibrary.Models
             ObjectIdValidation(nameof(_id), _id.ToString());
             NotEmptyStringValidation(nameof(Name), Name);
             NotEmptyStringValidation(nameof(Email), Email);
-            StartEndDateTimeValidation(CreationDateTime, nameof(CreationDateTime), DateTime.Now, nameof(DateTime.Now));
+            NotBiggerThanNowDateTimeValidation(nameof(CreationDateTime), CreationDateTime);
             NotEmptyStringValidation(nameof(Password), Password);
             NotEmptyStringValidation(nameof(Role), Role);
             NotBiggerThanNowDateTimeValidation(nameof(DateOfBirth), DateOfBirth);
             NotBiggerThanNowDateTimeValidation(nameof(LastLogin), LastLogin);
+        }
+
+        public void ValidateForCreation()
+        {
+            NotEmptyStringValidation(nameof(Name), Name);
+            NotEmptyStringValidation(nameof(Email), Email);
+            NotEmptyStringValidation(nameof(Password), Password);
+            NotBiggerThanNowDateTimeValidation(nameof(DateOfBirth), DateOfBirth);
         }
     }
 }
