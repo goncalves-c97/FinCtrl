@@ -124,5 +124,14 @@ namespace FinCtrlApi.Databases.MongoDb.FinCtrl.Repositories
                 return await query.FirstOrDefaultAsync();
             });
         }
+
+        public async Task UpdateAsync(T entity)
+        {
+            await ProjPolicies.ExecuteWithRetryAsync(async () =>
+            {
+                _context.Set<T>().Update(entity);
+                await _context.SaveChangesAsync();
+            });
+        }
     }
 }
