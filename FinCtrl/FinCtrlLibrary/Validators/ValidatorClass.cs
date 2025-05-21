@@ -107,6 +107,9 @@ namespace FinCtrlLibrary.Validators
         InvalidTokenError
     }
 
+    /// <summary>
+    /// Classe para validação de entidades, com diversos métodos para validação de forma mais simplificada
+    /// </summary>
     public abstract class ValidatorClass
     {
         private readonly Errors errors = [];
@@ -129,10 +132,10 @@ namespace FinCtrlLibrary.Validators
             string propertyNameToConsider = propertyName != null ? propertyName : "Id";
 
             if (!int.IsPositive(id))
-                Errors.RegisterError(GenericErrors.NegativeIdError, $"{propertyNameToConsider} não pode ser negativo.", propertyName);
+                Errors.RegisterError(GenericErrors.NegativeIdError, $"'{propertyNameToConsider}' não pode ser negativo.", propertyName);
 
             if (validateZero && id == 0)
-                Errors.RegisterError(GenericErrors.IdZeroError, $"{propertyNameToConsider} não pode ser 0", propertyName);
+                Errors.RegisterError(GenericErrors.IdZeroError, $"'{propertyNameToConsider}' não pode ser 0", propertyName);
         }
 
         protected void IdValidation(long id, string? propertyName = null, bool validateZero = false)
@@ -140,10 +143,10 @@ namespace FinCtrlLibrary.Validators
             string propertyNameToConsider = propertyName != null ? propertyName : "Id";
 
             if (!long.IsPositive(id))
-                Errors.RegisterError(GenericErrors.NegativeIdError, $"{propertyNameToConsider} não pode ser negativo.", propertyName);
+                Errors.RegisterError(GenericErrors.NegativeIdError, $"'{propertyNameToConsider}' não pode ser negativo.", propertyName);
 
             if (validateZero && id == 0)
-                Errors.RegisterError(GenericErrors.IdZeroError, $"{propertyNameToConsider} não pode ser 0", propertyName);
+                Errors.RegisterError(GenericErrors.IdZeroError, $"'{propertyNameToConsider}' não pode ser 0", propertyName);
         }
 
         protected void PositiveValueValidation(string propertyName, int value, bool validateZero = false)
